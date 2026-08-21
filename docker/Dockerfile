@@ -1,4 +1,4 @@
-ARG ISAACLAB_IMAGE=nvcr.io/nvidia/isaac-lab:2.3.1
+ARG ISAACLAB_IMAGE=nvcr.io/nvidia/isaac-lab:2.3.2
 FROM ${ISAACLAB_IMAGE}
 
 ARG HTTP_PROXY

@@ -11,6 +11,8 @@ set +a
 CONTAINER_NAME="${CONTAINER_NAME:-legged-lab}"
 LEGGED_LAB_IMAGE="${LEGGED_LAB_IMAGE:-legged-lab:latest}"
 NO_PROXY="${NO_PROXY:-localhost,127.0.0.1}"
+READY_MARKER="/tmp/legged-lab-ready"
+READY_TIMEOUT_SECONDS=300
 
 resolve_path() {
     local path="$1"
@@ -54,6 +56,7 @@ DOCKER_ARGS=(
     --name "${CONTAINER_NAME}"
     --entrypoint bash
     --network host
+    --runtime nvidia
     --gpus all
     --workdir /workspace/legged_lab
     --volume "${REPO_ROOT}:/workspace/legged_lab"
@@ -89,5 +92,25 @@ docker run "${DOCKER_ARGS[@]}" "${LEGGED_LAB_IMAGE}" -lc '
     cp /opt/legged_lab/vscode/settings.json /workspace/legged_lab/.vscode/settings.json
     /workspace/isaaclab/_isaac_sim/python.sh -m pip install -e /workspace/rsl_rl --no-deps
     /workspace/isaaclab/_isaac_sim/python.sh -m pip install -e /workspace/legged_lab/source/legged_lab
+    touch /tmp/legged-lab-ready
     exec bash
 '
+
+for ((attempt = 0; attempt < READY_TIMEOUT_SECONDS; attempt++)); do
+    if docker exec "${CONTAINER_NAME}" test -f "${READY_MARKER}"; then
+        echo "Container setup completed."
+        exit 0
+    fi
+
+    if [[ "$(docker inspect -f '{{.State.Running}}' "${CONTAINER_NAME}" 2>/dev/null || true)" != "true" ]]; then
+        echo "Container setup failed. Recent container logs:" >&2
+        docker logs --tail 100 "${CONTAINER_NAME}" >&2 || true
+        exit 1
+    fi
+
+    sleep 1
+done
+
+echo "Timed out waiting for container setup after ${READY_TIMEOUT_SECONDS} seconds." >&2
+docker logs --tail 100 "${CONTAINER_NAME}" >&2 || true
+exit 1
