@@ -43,3 +43,5 @@ _build
 # Codex local environment
 .codex/env.local.sh
 .agents/.local.env
+
+*.pkl

@@ -1,0 +1,62 @@
+gmr_dof_names:
+  - left_hip_pitch_joint
+  - left_hip_roll_joint
+  - left_hip_yaw_joint
+  - left_knee_joint
+  - left_ankle_pitch_joint
+  - left_ankle_roll_joint
+  - right_hip_pitch_joint
+  - right_hip_roll_joint
+  - right_hip_yaw_joint
+  - right_knee_joint
+  - right_ankle_pitch_joint
+  - right_ankle_roll_joint
+  - waist_yaw_joint
+  - left_shoulder_pitch_joint
+  - left_shoulder_roll_joint
+  - left_shoulder_yaw_joint
+  - left_elbow_joint
+  - left_wrist_roll_joint
+  - right_shoulder_pitch_joint
+  - right_shoulder_roll_joint
+  - right_shoulder_yaw_joint
+  - right_elbow_joint
+  - right_wrist_roll_joint
+
+
+# The articulation order comes from the official g1_23dof_rev_1_0 USD.
+lab_dof_names:
+  - left_hip_pitch_joint
+  - right_hip_pitch_joint
+  - waist_yaw_joint
+  - left_hip_roll_joint
+  - right_hip_roll_joint
+  - left_shoulder_pitch_joint
+  - right_shoulder_pitch_joint
+  - left_hip_yaw_joint
+  - right_hip_yaw_joint
+  - left_shoulder_roll_joint
+  - right_shoulder_roll_joint
+  - left_knee_joint
+  - right_knee_joint
+  - left_shoulder_yaw_joint
+  - right_shoulder_yaw_joint
+  - left_ankle_pitch_joint
+  - right_ankle_pitch_joint
+  - left_elbow_joint
+  - right_elbow_joint
+  - left_ankle_roll_joint
+  - right_ankle_roll_joint
+  - left_wrist_roll_joint
+  - right_wrist_roll_joint
+
+
+# Names of key bodies reconstructed by forward kinematics on the 23-DoF USD.
+# Pairs are ordered left then right for symmetry augmentation.
+lab_key_body_names:
+  - left_ankle_roll_link
+  - right_ankle_roll_link
+  - left_wrist_roll_rubber_hand
+  - right_wrist_roll_rubber_hand
+  - left_shoulder_roll_link
+  - right_shoulder_roll_link

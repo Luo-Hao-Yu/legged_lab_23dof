@@ -163,6 +163,53 @@ def ref_joint_vel(
         return ref_dof_vel
 
 
+def _select_ref_joints_by_name(
+    env: ManagerBasedAnimationEnv, values: torch.Tensor, joint_names: list[str]
+) -> torch.Tensor:
+    """Select reference joints in a named policy order without changing stored articulation order."""
+    robot: Articulation = env.scene["robot"]
+    cache = getattr(env, "_ref_joint_index_cache", None)
+    if cache is None:
+        cache = {}
+        setattr(env, "_ref_joint_index_cache", cache)
+    cache_key = tuple(joint_names)
+    if cache_key not in cache:
+        missing = sorted(set(joint_names) - set(robot.joint_names))
+        if missing:
+            raise ValueError(f"Reference observation joints are missing from the robot: {missing}")
+        indices = [robot.joint_names.index(name) for name in joint_names]
+        cache[cache_key] = torch.tensor(indices, dtype=torch.long, device=values.device)
+    return torch.index_select(values, dim=-1, index=cache[cache_key])
+
+
+def ref_joint_pos_by_name(
+    env: ManagerBasedAnimationEnv,
+    animation: str,
+    joint_names: list[str],
+    flatten_steps_dim: bool = True,
+) -> torch.Tensor:
+    """Return reference joint positions in the requested named order."""
+    animation_term: AnimationTerm = env.animation_manager.get_term(animation)
+    ref_dof_pos = _select_ref_joints_by_name(env, animation_term.get_dof_pos(), joint_names)
+    if flatten_steps_dim:
+        return ref_dof_pos.reshape(env.num_envs, -1)
+    return ref_dof_pos
+
+
+def ref_joint_vel_by_name(
+    env: ManagerBasedAnimationEnv,
+    animation: str,
+    joint_names: list[str],
+    flatten_steps_dim: bool = True,
+) -> torch.Tensor:
+    """Return reference joint velocities in the requested named order."""
+    animation_term: AnimationTerm = env.animation_manager.get_term(animation)
+    ref_dof_vel = _select_ref_joints_by_name(env, animation_term.get_dof_vel(), joint_names)
+    if flatten_steps_dim:
+        return ref_dof_vel.reshape(env.num_envs, -1)
+    return ref_dof_vel
+
+
 def ref_key_body_pos_b(
     env: ManagerBasedAnimationEnv,
     animation: str,
